@@ -1,6 +1,14 @@
 ---
-title: "Portfolio item number 1"
-excerpt: "Short description of portfolio item number 1<br/><img src='/images/500x300.png'>"
+title: "Machine Learning Projects"
+excerpt: "These are projects I have done to build my machine learning skills.<br/><img src='/images/ml.jpeg'><a href=”https://github.com/LucienMens/MLPractice”></a>"
+collection: portfolio
+
+title: "AirBnb Data Analysis"
+excerpt: "This project takes in airbnb csv files and processes the hosting info, room info, the price, and the types of rooms.<br/><img src='/images/data_analysis.jpg'><a href=https://github.com/LucienMens/AirbnbDataAnalysis”></a>"
+collection: portfolio
+
+title: "Natural Language Processing Projects"
+excerpt: "These are projects I have done to build my NLP skills.<br/><img src='/images/nlp.png'><a href=”https://github.com/LucienMens/NLPPractice”></a>"
 collection: portfolio
 ---
 
