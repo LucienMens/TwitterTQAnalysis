@@ -30,10 +30,7 @@ read their tweets
 Add: 
 '''
 
-consumer_key = "4OTRrIDSPFnWHZqNEprsIRHGu"
-consumer_secret = "Ls89ANMIs0nuELYyOe2RdMzVOM6xoNfY8BYfjSlsx2VAdhe4Us"
-access_token = "1066552856-WpKelzP4cA0LjxX8uJ8ooPDLq3uBLbMAaWVOMI0"
-access_token_secret = "HpSZ522nR1D9nE3HQVWxwugEdIxAZ8C8SLzVmbC69WSLK"
+
 
 #creating the authentication object
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
