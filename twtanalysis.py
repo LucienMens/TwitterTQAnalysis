@@ -1,7 +1,7 @@
 import tweepy
 from datetime import datetime
 from pprint import pprint
-from pandas import DataFrame as df
+import pandas as pd
 import sys
 import re
 '''
@@ -26,7 +26,7 @@ to include RT or to not........ maybe track seperately
 Do we want to scrape the tweets and get bios from the tweeters,
 
 tracking pronouns, gender expression words, and thembo etc.  in tweets, looking for correlation
-in people who use these words in conjunction to being queer
+in people who use these wor ds in conjunction to being queer
 only looking for people who use pronouns in their bio
 
 do i need to tokenize the words? - not yet
@@ -39,6 +39,7 @@ look for new words
 Add: 
     
 Tweepy is only pulling 100 tweets. Need to figure out a way around this.
+https://blog.finxter.com/how-to-match-an-exact-word-in-python-regex-answer-dont/
 '''
 
 
@@ -52,8 +53,6 @@ api = tweepy.API(auth)
 #account list for people we want to analyze
 account_list = ['uwucien','notsumma','flowerhija','annaperng']
 #this should be a function
-#make a list that contains pronoun type
-nb_pronouns = ['they', ]
 if len(account_list) > 0:
   for target in account_list:
     item = api.get_user(target)
@@ -97,71 +96,122 @@ pos_nb = []
 pos_masc = []
 pos_fem = []
 no_pronouns = []
+#no pronouns, but uses nb or genderqueer
+nbgq = []
 
 
 #terms we want to search for
 #i dont want users with this in their screenname, just the tweet
-query = "thembo"
+query1 = "thembo"
+query2 = "theydie"
+query3 = "femboy"
 #english language tweets
 language = "en"
 #can set number of tweets to pull - up to 100
 numTweets = 100
 #calling the user_timeline function with our parameters
-results = api.search(q=query, lang=language, count=numTweets)
+thembo_results = api.search(q=query1, lang=language, count=numTweets)
+femboy_results = api.search(q=query2, lang=language, count=numTweets)
 
 
-
-#for each through all tweets pulled
-for tweet in results:
-   #prints the username, tweet w query, and bio description
-   print(tweet.user.screen_name,"Tweeted:",tweet.text,"| User Description:",tweet.user.description)
-   if re.search((r'\bthey\b' or r'\bthem\b'), tweet.user.description):
-       pos_nb.append(tweet.user.screen_name)
-   if re.search((r'\bshe\b' or r'\bher\b'), tweet.user.description):
-       pos_fem.append(tweet.user.screen_name)
-   if re.search((r'\bhe\b' or r'\bhim\b'), tweet.user.description):
-       pos_masc.append(tweet.user.screen_name)
-   else:
-       for name in (pos_nb and pos_fem and pos_masc):
-           if tweet.user.screen_name not in (pos_nb and pos_fem and pos_masc):
-               no_pronouns.append(tweet.user.screen_name)
-#this does not currently catch people who use multiple pronouns
+#needs to not matter if they use caps or not
+#function to search through tweets
+#def searchTweet(x): 
+for tweet in thembo_results:
+        #prints the username, tweet w query, and bio description
+        #print(tweet.user.screen_name,"Tweeted:",tweet.text,"| User Description:",tweet.user.description)
+        #this searches for they/them
+        if re.search((r'\bthey\b' or r'\bthem\b'), tweet.user.description):
+            
+            pos_nb.append(tweet.user.screen_name)
+           
+        if re.search((r'\bshe\b' or r'\bher\b'), tweet.user.description):
+            pos_fem.append(tweet.user.screen_name)
+        if re.search((r'\bhe\b' or r'\bhim\b'), tweet.user.description):
+            pos_masc.append(tweet.user.screen_name)
+   #people who use words like genderqueer, nb
+        if re.search((r'\bnonbinary\b' or r'\bGenderqueer\b'), tweet.user.description):
+           nbgq.append(tweet.user.screen_name)
+        else:
+           for name in (pos_nb and pos_fem and pos_masc):
+               if tweet.user.screen_name not in (pos_nb and pos_fem and pos_masc and nbgq):
+                   no_pronouns.append(tweet.user.screen_name)
 #removes duplicates - list(set(x))
-print("Possibly nb:", list(set(pos_nb)), '\nPossibly fem:',list(set(pos_fem)), "\nPossibly masc:", list(set(pos_masc)), "\nno pronouns:",list(set(no_pronouns)))
-
-#people who use words like genderqueer, nb
-
-#Track people who use it in their bio
+print("Possibly nb:", list(set(pos_nb)), "\nNo pronouns, but possibly nb:", list(set(nbgq)), '\nPossibly fem:',list(set(pos_fem)), "\nPossibly masc:", list(set(pos_masc)), "\nno pronouns:",list(set(no_pronouns)))
+    #Track people who use it in their bio
+ 
 total = list(set(pos_fem)) + list(set(pos_nb)) + list(set(pos_masc)) + list(set(no_pronouns))
 #percentage of people who do not have pronouns in their bios
-print(len(set(no_pronouns)) / len(total))
+print("Percentage of people with no pronouns:", len(set(no_pronouns)) / len(total))
+#percentage of people who user she/her
+print("Percentage of people with she/her pronouns:", len(set(pos_fem)) / len(total))
+#percentage of people who user he/him
+print("Percentage of people with he/him pronouns:", len(set(pos_masc)) / len(total))
+#percentage of people who user they/them
+print("Percentage of people with they/them pronouns:", len(set(pos_nb)) / len(total))
+    
+    
+#searchTweet(thembo_results)
 
-
-#Track amount of people who use both nb and binary pronouns BROKEN
-multiple = []
+#Track amount of people who use both nb and binary pronouns, right now only tracks 2
+he_multiple = []
+she_multiple = []
+nb = []
+tweets = []
+multi = 0
 #now to compare how many users are multiple lists
-for name in pos_nb:
-    if tweet.user.screen_name in pos_fem:
-        if tweet.user.screen_name in pos_nb:
-            multiple.append(tweet.user.screen_name)
-    #elif tweet.user.screen_name in (pos_nb and pos_masc):
-     #   multiple.append(tweet.user.screen_name)
-#print("Users that have more than one set of pronouns: ", multiple)
+for tweet in thembo_results:
+    tweets.append(tweet.text)
+    if re.search((r'\bthey\b' or r'\bthem\b'), tweet.user.description):
+        nb.append(tweet.user.screen_name)
+    if re.search((r'\bhe\b' or r'\bhe\b'), tweet.user.description):
+        if tweet.user.screen_name in nb:
+            he_multiple.append(tweet.user.screen_name)
+    if re.search((r'\bshe\b' or r'\bher\b'), tweet.user.description):
+        if tweet.user.screen_name in nb:
+            she_multiple.append(tweet.user.screen_name)
+        
+    #print(tweet.user.screen_name,"Tweeted:",tweet.text,"| User Description:",tweet.user.description)          
+print("He/they: ", he_multiple)
+print("She/they: ", she_multiple)
+#percentages of two sets of pronouns
+print("Amount of people with both he and they pronouns: ", len(set(he_multiple)) / len(total))
+print("Amount of people with both she and they pronouns: ", len(set(she_multiple)) / len(total))
 
-#Print out the percentages of the pronouns/gender identities. 
+#Print out the percentages of the pronouns/gender identities.
+
+#search for them based neologisms
+for tweet in thembo_results:
+    if re.search((r'\bthem[a-zA-Z]*'), tweet.text):
+        print(tweet.text)
 
 #look at bigrams and tri grams of the words around it
 
-#search for neologisms
-'''
-regex = re.compile('them.')
-matches = [string for string in tweet.text if re.match(regex, string)]
-print(matches)
 
-for tweet in results:
-    if 'thembo' in tweet.text:
-        print(tweet.text)
+#need to put all the variables in a dataframe
+data = {"tweets" : [], 
+        'screen_name' : []}
 
-    neologism = re.finditer(r"\w+them", tweet.text)
-print(neologism)
+
+for t in thembo_results:
+    data['tweets'].append(t['tweets'])
+    data['screen_name'].append(t['screen_name'])
+    
+df = pd.DataFrame(data)
+   #     {'tweets': [tweets],
+    #     'screen_name': [tweet.user.screen_name],
+     #    'description': [tweet.user.description]
+      #   })
+
+print(df)
+#display this data in matplot (bar graphs, pie chart)
+''' 
+in my dataframe i want:
+    title is: which search results they appeared from
+    tweet (to tokenize for ngrams)
+    user.screen_name
+    user.description
+    their pronouns
+    if they use two sets of pronouns
+    
 '''
