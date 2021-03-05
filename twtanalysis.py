@@ -136,7 +136,7 @@ theybie_res = api.search(q=query9, lang=language, count=numTweets)
 #needs to not matter if they use caps or not
 #function to search through tweets
 #def searchTweet(x): 
-for tweet in gaydies_res:
+for tweet in thembo_res:
         #prints the username, tweet w query, and bio description
       #  print(tweet.user.screen_name,"Tweeted:",tweet.text,"| User Description:",tweet.user.description)
         #this searches for they/them
@@ -179,9 +179,10 @@ she_multiple = []
 nb = []
 tweets = []
 multi = 0
+screennames = []
 #now to compare how many users are multiple lists
-for tweet in gaydies_res:
-    tweets.append(tweet.text)
+for tweet in thembo_res:
+    screennames.append(tweet.user.screen_name)
     if re.search((r'\bthey\b' or r'\bthem\b'), tweet.user.description, re.IGNORECASE):
         nb.append(tweet.user.screen_name)
     if re.search((r'\bhe\b' or r'\bhe\b'), tweet.user.description, re.IGNORECASE):
@@ -203,7 +204,7 @@ print("Amount of people with both she and they pronouns: ", len(set(she_multiple
 
 #graph of thembo to theydie screen name ratio
 #graph of thembo to theydie name (like display name) ratio
-
+'''
 labels = ["no pronouns","she/her","they/them", 'he/him']
 sizes = [(len(set(no_pronouns)) / len(total)),(len(set(pos_fem)) / len(total)),(len(set(pos_nb)) / len(total)), (len(set(pos_masc)) / len(total))]
 plt.pie(sizes, labels=labels,explode= (0.01,0.01,0.01,0.01), autopct='%1.1f%%')
@@ -215,6 +216,47 @@ sizes = [(len(set(he_multiple)) / len(total2)),(len(set(she_multiple)) / len(tot
 plt.pie(sizes, labels=labels,explode= (0.01,0.01), autopct='%1.1f%%')
 plt.axis('equal')
 plt.show()
+'''
+import time
+
+# Create empty dataframe
+user_features_list = ["screen_name", "name", "location", "bio", "statuses_count",
+                      "he/him", "she/her", "they/them", "he/they", "she/they",
+                      "theybie", "theydie"]
+# features such as "he/him", etc. and "theybie", etc. can or could be represented by 1s and 0s (or Yes's and No's if you prefer)
+# You could also just have a column called "pronouns" and have it be an array (with 0 or more elements) of what pronouns are in a bio
+# just my two cents though, take whatever you wanna use!
+
+#need to remove duplicates
+users_df = pd.DataFrame(columns = user_features_list)
+
+# account list for people we want to analyze
+account_list = ['uwucien','notsumma','flowerhija','annaperng']
+
+# Loop through each user in the list of users, extract features and append the features to users_df
+for user in screennames:
+    # Create empty dict
+    user_features = {}
+    # Get user data
+    item = api.get_user(user)
+    user_features['bio'] = item.description
+    user_features['screen_name'] = item.screen_name
+    user_features['name'] = item.name
+    user_features['location'] = item.location
+    user_features['bio'] = item.description
+    user_features['statuses_count'] = item.statuses_count
+    #this does not work
+    if tweet.user.screen_name in pos_nb:
+        user_features['they/them'] = 1
+    # Concat the dfs
+    user = pd.DataFrame(user_features, index = [0])
+    users_df = pd.concat([users_df, user], ignore_index = True)
+    # Sleep for 5 seconds to avoid rate-limiting
+    # Number of seconds can be tweaked as needed (through trial and error)
+    #time.sleep(5)
+    
+users_df
+
 
 '''plt.hist(multi, bins = 30)
 plt.title("Amount of pronouns")
