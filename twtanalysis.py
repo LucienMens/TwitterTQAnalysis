@@ -5,6 +5,17 @@ import pandas as pd
 import sys
 import re
 import matplotlib.pyplot as plt
+from nltk.corpus import twitter_samples
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.corpus import twitter_samples, stopwords, movie_reviews
+from nltk.tag import pos_tag
+from nltk.tokenize import word_tokenize
+from nltk import FreqDist, classify, NaiveBayesClassifier
+
+import re, string, random
+import nltk.classify.util
+from nltk.classify import NaiveBayesClassifier
+
 
 '''
 This program is taking in Twitter data, looking for key words, and then presenting their screen name,
@@ -84,6 +95,13 @@ if re.search((r'\bshe\b' or r'\bher\b'), twt_bio):
 if re.search((r'\bthey\b' or r'\bthem\b'), twt_bio): #any pronouns, all pronouns
             print("! possibly nb")
             pronouns = 1
+
+            
+            #xe/xir
+            #it/its
+            #he/they,she/theys
+            
+            
 if pronouns == 0:  
     #now I need to find if there aren't pronouns in bio
         print("! no pronouns or neopronouns")
@@ -98,13 +116,16 @@ if pronouns == 0:
 #pronouns = "she","her","him","his","they","them","bun","xe","xir" #figure out how to list multiple strings
       
 #empty list for people who are possibly nonbinary (using that as a general catch all, will elaborate)
-pos_nb = []
-pos_masc = []
-pos_fem = []
+pro_they = []
+pro_he = []
+pro_she = []
+pro_it = []
+pro_xe = []
+pro_ze = []
 no_pronouns = []
 #no pronouns, but uses nb or genderqueer
 nbgq = []
-
+tweets = []
 
 #terms we want to search for
 #i dont want users with this in their screenname, just the tweet
@@ -117,6 +138,9 @@ query6 = "gaydies"
 query7 = "they/thems"
 query8 = "girls, gays, and theys"
 query9 = "theybie"
+query10 = "himbo"
+query11 = "bimbo"
+query12 = "xembo"
 #english language tweets
 language = "en"
 #can set number of tweets to pull - up to 100
@@ -131,32 +155,48 @@ gaydies_res = api.search(q=query6, lang=language, count=numTweets)
 theythems_res = api.search(q=query7, lang=language, count=numTweets)
 phrase1_res = api.search(q=query8, lang=language, count=numTweets)
 theybie_res = api.search(q=query9, lang=language, count=numTweets)
+himbo_res = api.search(q=query10, lang=language, count=numTweets)
+bimbo_res = api.search(q=query11, lang=language, count=numTweets)
+zedies_res = api.search(q=query12, lang=language, count=numTweets)
+
 
 
 #needs to not matter if they use caps or not
 #function to search through tweets
 #def searchTweet(x): 
-for tweet in thembo_res:
+for tweet in zedies_res:
         #prints the username, tweet w query, and bio description
-      #  print(tweet.user.screen_name,"Tweeted:",tweet.text,"| User Description:",tweet.user.description)
+        tweets.append(tweet.text)
+        print(tweet.user.screen_name,"Tweeted:",tweet.text,"| User Description:",tweet.user.description)
         #this searches for they/them
         if re.search((r'\bthey\b' or r'\bthem\b'), tweet.user.description, re.IGNORECASE):
-            pos_nb.append(tweet.user.screen_name) #searches for she/her
+            pro_they.append(tweet.user.screen_name) #searches for she/her
         if re.search((r'\bshe\b' or r'\bher\b'), tweet.user.description, re.IGNORECASE):
-            pos_fem.append(tweet.user.screen_name)
+            pro_she.append(tweet.user.screen_name)
         if re.search((r'\bhe\b' or r'\bhim\b'), tweet.user.description, re.IGNORECASE):
-            pos_masc.append(tweet.user.screen_name)
+            pro_he.append(tweet.user.screen_name)
+        if re.search((r'\bit\b' or r'\bits\b'), tweet.user.description, re.IGNORECASE):
+            pro_it.append(tweet.user.screen_name)
+        if re.search((r'\bxe\b' or r'\bxir\b' or r'\bxem\b'), tweet.user.description, re.IGNORECASE):
+            pro_xe.append(tweet.user.screen_name)
+        if re.search((r'\bze\b' or r'\bzir\b' or r'\bzem\b'), tweet.user.description, re.IGNORECASE):
+            pro_ze.append(tweet.user.screen_name)
+            #de,dem
    #people who use words like genderqueer, nb
         if re.search((r'\bnonbinary\b' or r'\bgenderqueer\b'), tweet.user.description, re.IGNORECASE):
            nbgq.append(tweet.user.screen_name)
         else:
-           for name in (pos_nb and pos_fem and pos_masc):
-               if tweet.user.screen_name not in (pos_nb and pos_fem and pos_masc and nbgq):
+           for name in (pro_they and pro_she and pro_he):
+               if tweet.user.screen_name not in (pro_they and pro_she and pro_he and nbgq and pro_it and pro_xe and pro_ze):
                    no_pronouns.append(tweet.user.screen_name)
 #removes duplicates - list(set(x))
-print("Possibly nb:", list(set(pos_nb)), "\nNo pronouns, but possibly nb:", list(set(nbgq)), '\nPossibly fem:',list(set(pos_fem)), "\nPossibly masc:", list(set(pos_masc)), "\nno pronouns:",list(set(no_pronouns)))
-    #Track people who use it in their bio
+print("Possibly nb:", list(set(pro_they)), "\nNo pronouns, but possibly nb:", list(set(nbgq)), '\nShe/her: ',list(set(pro_she)), "\nHe/him: ", list(set(pro_he)), "\nno pronouns:",list(set(no_pronouns)), "\nit: ", list(set(pro_it)), "\nxe: ", list(set(pro_xe)), "\nze: ", list(set(pro_ze)))
+print(len(set(pro_they))+len(set(pro_he))+len(set(pro_she))+len(set(pro_xe))+len(set(pro_ze))+len(set(pro_it))) 
+   #Track people who use it in their bio
  
+    #search for neologisms within tweet
+    #csv - data recording
+'''
 total = list(set(pos_fem)) + list(set(pos_nb)) + list(set(pos_masc)) + list(set(no_pronouns))
 #percentage of people who do not have pronouns in their bios
 print("Percentage of people with no pronouns:", len(set(no_pronouns)) / len(total))
@@ -181,7 +221,7 @@ tweets = []
 multi = 0
 screennames = []
 #now to compare how many users are multiple lists
-for tweet in thembo_res:
+for tweet in theybie_res:
     screennames.append(tweet.user.screen_name)
     if re.search((r'\bthey\b' or r'\bthem\b'), tweet.user.description, re.IGNORECASE):
         nb.append(tweet.user.screen_name)
@@ -204,7 +244,7 @@ print("Amount of people with both she and they pronouns: ", len(set(she_multiple
 
 #graph of thembo to theydie screen name ratio
 #graph of thembo to theydie name (like display name) ratio
-'''
+
 labels = ["no pronouns","she/her","they/them", 'he/him']
 sizes = [(len(set(no_pronouns)) / len(total)),(len(set(pos_fem)) / len(total)),(len(set(pos_nb)) / len(total)), (len(set(pos_masc)) / len(total))]
 plt.pie(sizes, labels=labels,explode= (0.01,0.01,0.01,0.01), autopct='%1.1f%%')
@@ -216,7 +256,8 @@ sizes = [(len(set(he_multiple)) / len(total2)),(len(set(she_multiple)) / len(tot
 plt.pie(sizes, labels=labels,explode= (0.01,0.01), autopct='%1.1f%%')
 plt.axis('equal')
 plt.show()
-'''
+
+
 import time
 
 # Create empty dataframe
@@ -256,7 +297,7 @@ for user in screennames:
     #time.sleep(5)
     
 users_df
-
+'''
 
 '''plt.hist(multi, bins = 30)
 plt.title("Amount of pronouns")
@@ -305,4 +346,126 @@ in my dataframe i want:
     their pronouns
     if they use two sets of pronouns
     
-'''
+
+def remove_noise(tweet_tokens, stop_words = ()):
+
+    cleaned_tokens = []
+
+    for token, tag in pos_tag(tweet_tokens):
+        token = re.sub('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\(\),]|'\
+                       '(?:%[0-9a-fA-F][0-9a-fA-F]))+','', token)
+        token = re.sub("(@[A-Za-z0-9_]+)","", token)
+
+        if tag.startswith("NN"):
+            pos = 'n'
+        elif tag.startswith('VB'):
+            pos = 'v'
+        else:
+            pos = 'a'
+
+        lemmatizer = WordNetLemmatizer()
+        token = lemmatizer.lemmatize(token, pos)
+
+        if len(token) > 0 and token not in string.punctuation and token.lower() not in stop_words:
+            cleaned_tokens.append(token.lower())
+    return cleaned_tokens
+
+def get_all_words(cleaned_tokens_list):
+    for tokens in cleaned_tokens_list:
+        for token in tokens:
+            yield token
+
+def get_tweets_for_model(cleaned_tokens_list):
+    for tweet_tokens in cleaned_tokens_list:
+        yield dict([token, True] for token in tweet_tokens)
+
+if __name__ == "__main__":
+
+    positive_tweets = twitter_samples.strings('positive_tweets.json')
+    negative_tweets = twitter_samples.strings('negative_tweets.json')
+    text = twitter_samples.strings('tweets.20150430-223406.json')
+    tweet_tokens = twitter_samples.tokenized('positive_tweets.json')[0]
+
+    stop_words = stopwords.words('english')
+
+    positive_tweet_tokens = twitter_samples.tokenized('positive_tweets.json')
+    negative_tweet_tokens = twitter_samples.tokenized('negative_tweets.json')
+
+    positive_cleaned_tokens_list = []
+    negative_cleaned_tokens_list = []
+
+    for tokens in positive_tweet_tokens:
+        positive_cleaned_tokens_list.append(remove_noise(tokens, stop_words))
+
+    for tokens in negative_tweet_tokens:
+        negative_cleaned_tokens_list.append(remove_noise(tokens, stop_words))
+
+    all_pos_words = get_all_words(positive_cleaned_tokens_list)
+
+    freq_dist_pos = FreqDist(all_pos_words)
+    print(freq_dist_pos.most_common(10))
+
+    positive_tokens_for_model = get_tweets_for_model(positive_cleaned_tokens_list)
+    negative_tokens_for_model = get_tweets_for_model(negative_cleaned_tokens_list)
+
+    positive_dataset = [(tweet_dict, "Positive")
+                         for tweet_dict in positive_tokens_for_model]
+
+    negative_dataset = [(tweet_dict, "Negative")
+                         for tweet_dict in negative_tokens_for_model]
+
+    dataset = positive_dataset + negative_dataset
+
+    random.shuffle(dataset)
+
+    train_data = dataset[:7000]
+    test_data = dataset[7000:]
+
+    classifier = NaiveBayesClassifier.train(train_data)
+
+    print("Accuracy is:", classify.accuracy(classifier, test_data))
+
+    print(classifier.show_most_informative_features(10))
+
+    for tweet in tweets:
+       print("\ntweet: "), tweet
+       probdist = classifier.prob_classify(extract_features(tweet.split()))
+       pred_sentiment = probdist.max()
+        
+     # custom_tokens = remove_noise(word_tokenize(tweets))
+
+    #print(tweets, classifier.classify(dict([token, True] for token in custom_tokens)))
+   
+def extract_features(word_list):
+    return dict([(word, True) for word in word_list])
+
+if __name__=='__main__':
+   # Load positive and negative reviews  
+   positive_fileids = movie_reviews.fileids('pos')
+   negative_fileids = movie_reviews.fileids('neg')
+   features_positive = [(extract_features(movie_reviews.words(fileids=[f])), 
+           'Positive') for f in positive_fileids]
+   features_negative = [(extract_features(movie_reviews.words(fileids=[f])), 
+           'Negative') for f in negative_fileids]
+   #Split the data into train and test (80/20)
+   threshold_factor = 0.8
+   threshold_positive = int(threshold_factor * len(features_positive))
+   threshold_negative = int(threshold_factor * len(features_negative))
+   features_train = features_positive[:threshold_positive] + features_negative[:threshold_negative]
+   features_test = features_positive[threshold_positive:] + features_negative[threshold_negative:]  
+   print("\nNumber of training datapoints:"), len(features_train)
+   print("Number of test datapoints:"), len(features_test)
+   # Train a Naive Bayes classifier
+   classifier = NaiveBayesClassifier.train(features_train)
+   print("\nAccuracy of the classifier:"), nltk.classify.util.accuracy(classifier, features_test)
+   print("\nTop 10 most informative words:")
+   for item in classifier.most_informative_features()[:10]:
+       print(item[0])
+   print("\nPredictions:")
+   for review in tweets:
+       print("\nReview:", review)
+       probdist = classifier.prob_classify(extract_features(review.split()))
+       pred_sentiment = probdist.max()
+       print("Predicted sentiment:", pred_sentiment)
+       print("Probability:", round(probdist.prob(pred_sentiment), 2))
+      '''
