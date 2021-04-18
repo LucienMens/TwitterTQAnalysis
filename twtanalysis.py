@@ -116,57 +116,52 @@ if pronouns == 0:
 #pronouns = "she","her","him","his","they","them","bun","xe","xir" #figure out how to list multiple strings
       
 #empty list for people who are possibly nonbinary (using that as a general catch all, will elaborate)
-pro_they = []
-pro_he = []
-pro_she = []
-pro_it = []
-pro_xe = []
-pro_ze = []
-no_pronouns = []
-authors = []
-#no pronouns, but uses nb or genderqueer
-nbgq = []
-tweets = []
 
+user_features_list = ["screen_name", "name", "location", "bio", "tweet",
+                      "he/him", "she/her", "they/them",
+                      "it/its", "xe/xem", "ze/zir"]
+# features such as "he/him", etc. and "theybie", etc. can or could be represented by 1s and 0s (or Yes's and No's if you prefer)
+# You could also just have a column called "pronouns" and have it be an array (with 0 or more elements) of what pronouns are in a bio
+# just my two cents though, take whatever you wanna use!
+
+#need to remove duplicates
+
+#users_df = pd.DataFrame(columns = user_features_list)
+# account list for people we want to analyze
+#
+
+# Loop through each user in the list of users, extract features and append the features to users_df
+#def createDF(x): 
 #terms we want to search for
 #i dont want users with this in their screenname, just the tweet
-res_dict = {}
-thembo = "thembo"
-bimbo = "bimbo"
-himbo = "himbo"
-theydies = "theydies"
-ladies = "ladies"
-gentlethem = "gentlethem"
-gentlemen = "gentlemen"
-theybie = "theybie"
-transgender = "transgender"
-transwoman = "transwoman"
-transman = "transman"
-
-#could do more control
+query_list = ["thembo","bimbo","himbo","theydies", "gentlethem", "gentlemen", "theybie", "transgender","theybie","transgender","transwoman","transman"]
+res_dict = {} 
 
 #english language tweets
 language = "en"
 #can set number of tweets to pull - up to 100
 numTweets = 100
 #calling the user_timeline function with our parameters
-thembo_res = api.search(q=thembo, lang=language, count=numTweets)
-bimbo_res = api.search(q=bimbo, lang=language, count=numTweets)
-himbo_res = api.search(q=himbo, lang=language, count=numTweets)
-theydies_res = api.search(q=theydies, lang=language, count=numTweets)
-ladies_res = api.search(q=ladies, lang=language, count=numTweets)
-gentlethem_res = api.search(q=gentlethem, lang=language, count=numTweets)
-gentlemen_res = api.search(q=gentlemen, lang=language, count=numTweets)
-theybie_res = api.search(q=theybie, lang=language, count=numTweets)
-trans_res = api.search(q=transgender, lang=language, count=numTweets)
-transwoman_res = api.search(q=transwoman, lang=language, count=numTweets)
-transman_res = api.search(q=transman, lang=language, count=numTweets)
-
+for query in query_list:
+    res_dict[query] = api.search(q=query, lang=language, count=numTweets)
 
 #needs to not matter if they use caps or not
 #function to search through tweets
-#def searchTweet(x): 
-for tweet in himbo_res:
+#def searchTweet(x):
+for query in query_list:   
+    users_df = pd.DataFrame(columns = user_features_list)
+    pro_they = []
+    pro_he = []
+    pro_she = []
+    pro_it = []
+    pro_xe = []
+    pro_ze = []
+    no_pronouns = []
+    authors = []
+#no pronouns, but uses nb or genderqueer
+    nbgq = []
+    tweets = []
+    for tweet in res_dict[query]:
         #prints the username, tweet w query, and bio description
         tweets.append(tweet.text)
         #print(tweet.user.screen_name,"Tweeted:",tweet.text,"| User Description:",tweet.user.description)
@@ -200,10 +195,54 @@ for tweet in himbo_res:
    #people who use words like genderqueer, nb
         if re.search((r'\bnonbinary\b' or r'\bgenderqueer\b'), tweet.user.description, re.IGNORECASE):
            nbgq.append(tweet.user.screen_name)
+           
+    for tweet in res_dict[query]:
+        
+    # Create empty dict
+        user_features = {}
+    # Get user data
+    #if user in pro:
+   # item = api.get_user(user)
+        user_features['bio'] = tweet.user.description
+        user_features['screen_name'] = tweet.user.screen_name
+        user_features['name'] = tweet.user.name
+        user_features['tweet'] = tweet.text
+        user_features['location'] = tweet.user.location
+        #fills in the yeses
+        if tweet.user.screen_name in pro_they:
+            user_features['they/them'] = 'yes'
+        if tweet.user.screen_name in pro_he:
+            user_features['he/him'] = 'yes'
+        if tweet.user.screen_name in pro_she:
+            user_features['she/her'] = 'yes'
+        if tweet.user.screen_name in pro_it:
+            user_features['it/its'] = 'yes'
+        if tweet.user.screen_name in pro_xe:
+            user_features['xe/xem'] = 'yes'
+        if tweet.user.screen_name in pro_ze:
+            user_features['ze/zem'] = 'yes'
+        #fills in the nos
+        if tweet.user.screen_name not in pro_he:
+            user_features['he/him'] = 'no'
+        if tweet.user.screen_name not in pro_she:
+            user_features['she/her'] = 'no'
+        if tweet.user.screen_name not in pro_xe:
+            user_features['xe/xem'] = 'no'
+        if tweet.user.screen_name not in pro_they:
+            user_features['they/them'] = 'no'
+        if tweet.user.screen_name not in pro_it:
+            user_features['it/its'] = 'no'
+        if tweet.user.screen_name not in pro_ze:
+            user_features['ze/zir'] = 'no'
+        # Concat the dfs
+        user = pd.DataFrame(user_features, index = [0])
+        users_df = pd.concat([users_df, user], ignore_index = True)
+    date_string = '4_18'
+    filename = '%s_%s.csv' % (query, date_string)   
+    users_df.to_csv(filename, encoding='utf-8', index=False)
    # return pro_ze, pro_xe, pro_it, pro_he, pro_she, pro_they
 #list of usernames
-pro = pro_ze + pro_xe + pro_it + pro_he + pro_she + pro_they
-set(pro)
+    pro = pro_ze + pro_xe + pro_it + pro_he + pro_she + pro_they
 
 screennames = []
 #for tweet in gentlethem_res:
@@ -212,13 +251,6 @@ screennames = []
   #      no_pronouns.append(tweet.user.screen_name)
 
 print("length of set of pro: ", len(set(pro)))
-
-
-         
-         #   
-         #   print("num of tweets w no pro: ", len(tweet.text))
-#print("if statement version: ", len(set(no_pronouns)))
-
 
 #removes duplicates - list(set(x))
 #nopronouns = (len(set(pro_they))+len(set(pro_he))+len(set(pro_she))+len(set(pro_xe))+len(set(pro_ze))+len(set(pro_it))) - (len(set(pro)))
@@ -253,7 +285,8 @@ multi = 0
 #now to compare how many users are multiple lists
 #two sets of pronouns are still being counted in they, they need to be removed from the original list
 #def twoPronouns(x): 
-for tweet in himbo_res:
+'''
+for tweet in thembo_res:
         screennames.append(tweet.user.screen_name)
 if re.search((r'\bthey\b' or r'\bthem\b'), tweet.user.description, re.IGNORECASE):
         nb.append(tweet.user.screen_name)
@@ -265,7 +298,7 @@ if re.search((r'\bthey\b' or r'\bthem\b'), tweet.user.description, re.IGNORECASE
                     she_they.append(tweet.user.screen_name)
    # return he_they, she_they
     #need to code for if someone is in both categories
- 
+
 #total = len(set(pro_they)) + len(set(pro_she))+ len(set(pro_he)) + nopronouns + len(set(pro_it)) + len(set(pro_xe))+ len(set(pro_ze)) +len(set(he_they)) + len(set(she_they))
 #percentage of people who do not have pronouns in their bios
 #print("Percentage of people with no pronouns:", nopronouns / total)
@@ -330,8 +363,10 @@ user_features_list = ["screen_name", "name", "location", "bio", "tweet",
 
 # Loop through each user in the list of users, extract features and append the features to users_df
 #def createDF(x): 
+
 users_df = pd.DataFrame(columns = user_features_list)
-for tweet in himbo_res:
+for query in query_list:
+    for tweet in res_dict[query]:
     # Create empty dict
         user_features = {}
     # Get user data
@@ -371,14 +406,17 @@ for tweet in himbo_res:
         # Concat the dfs
         user = pd.DataFrame(user_features, index = [0])
         users_df = pd.concat([users_df, user], ignore_index = True)
-        users_df.to_csv('himbo_417.csv', encoding='utf-8', index=False)
+        date_string = '4_18'
+        filename = '%s_%s.csv' % (query, date_string)
+        
+        users_df.to_csv((query, date_string), encoding='utf-8', index=False)
 #        return users_df
     
 #x = input("Enter a query: ")
 #searchTweet(x)
 #twoPronouns(x)
 #createDF(x)
-'''
+
 #search for them based neologisms
 for tweet in theythems_res:
     if re.search((r'\bboy[a-zA-Z]*'), tweet.text):
