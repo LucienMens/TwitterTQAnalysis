@@ -130,42 +130,43 @@ tweets = []
 
 #terms we want to search for
 #i dont want users with this in their screenname, just the tweet
-query1 = "thembo"
-query2 = "theydie"
-query3 = "femboy"
-query4 = "gentlethem"
-query5 = "gays"
-query6 = "gaydie"
-query7 = "they/thems"
-query8 = "girls, gays, and theys"
-query9 = "theybie"
-query10 = "himbo"
-query11 = "bimbo"
-query12 = "xembo"
+res_dict = {}
+thembo = "thembo"
+bimbo = "bimbo"
+himbo = "himbo"
+theydies = "theydies"
+ladies = "ladies"
+gentlethem = "gentlethem"
+gentlemen = "gentlemen"
+theybie = "theybie"
+transgender = "transgender"
+transwoman = "transwoman"
+transman = "transman"
+
+#could do more control
+
 #english language tweets
 language = "en"
 #can set number of tweets to pull - up to 100
 numTweets = 100
 #calling the user_timeline function with our parameters
-thembo_res = api.search(q=query1, lang=language, count=numTweets)
-theydies_res = api.search(q=query2, lang=language, count=numTweets)
-femboy_res = api.search(q=query3, lang=language, count=numTweets)
-gentlethem_res = api.search(q=query4, lang=language, count=numTweets)
-gays_res = api.search(q=query5, lang=language, count=numTweets)
-gaydies_res = api.search(q=query6, lang=language, count=numTweets)
-theythems_res = api.search(q=query7, lang=language, count=numTweets)
-phrase1_res = api.search(q=query8, lang=language, count=numTweets)
-theybie_res = api.search(q=query9, lang=language, count=numTweets)
-himbo_res = api.search(q=query10, lang=language, count=numTweets)
-bimbo_res = api.search(q=query11, lang=language, count=numTweets)
-xembo_res = api.search(q=query12, lang=language, count=numTweets)
-
+thembo_res = api.search(q=thembo, lang=language, count=numTweets)
+bimbo_res = api.search(q=bimbo, lang=language, count=numTweets)
+himbo_res = api.search(q=himbo, lang=language, count=numTweets)
+theydies_res = api.search(q=theydies, lang=language, count=numTweets)
+ladies_res = api.search(q=ladies, lang=language, count=numTweets)
+gentlethem_res = api.search(q=gentlethem, lang=language, count=numTweets)
+gentlemen_res = api.search(q=gentlemen, lang=language, count=numTweets)
+theybie_res = api.search(q=theybie, lang=language, count=numTweets)
+trans_res = api.search(q=transgender, lang=language, count=numTweets)
+transwoman_res = api.search(q=transwoman, lang=language, count=numTweets)
+transman_res = api.search(q=transman, lang=language, count=numTweets)
 
 
 #needs to not matter if they use caps or not
 #function to search through tweets
 #def searchTweet(x): 
-for tweet in theydies_res:
+for tweet in himbo_res:
         #prints the username, tweet w query, and bio description
         tweets.append(tweet.text)
         #print(tweet.user.screen_name,"Tweeted:",tweet.text,"| User Description:",tweet.user.description)
@@ -173,29 +174,45 @@ for tweet in theydies_res:
         #this searches for they/them
         if re.search((r'\bthey\b' or r'\bthem\b'), tweet.user.description, re.IGNORECASE):
             pro_they.append(tweet.user.screen_name) #searches for they/them
+        if re.search((r'\bthey\b' or r'\bthem\b'), tweet.user.location, re.IGNORECASE):
+            pro_they.append(tweet.user.screen_name) #searches for they/them
         if re.search((r'\bshe\b' or r'\bher\b'), tweet.user.description, re.IGNORECASE):
+            pro_she.append(tweet.user.screen_name)
+        if re.search((r'\bshe\b' or r'\bher\b'), tweet.user.location, re.IGNORECASE):
             pro_she.append(tweet.user.screen_name)
         if re.search((r'\bhe\b' or r'\bhim\b'), tweet.user.description, re.IGNORECASE):
             pro_he.append(tweet.user.screen_name)
+        if re.search((r'\bhe\b' or r'\bhim\b'), tweet.user.location, re.IGNORECASE):
+            pro_he.append(tweet.user.screen_name)
         if re.search((r'\bit\b' or r'\bits\b'), tweet.user.description, re.IGNORECASE):
+            pro_it.append(tweet.user.screen_name)
+        if re.search((r'\bit\b' or r'\bits\b'), tweet.user.location, re.IGNORECASE):
             pro_it.append(tweet.user.screen_name)
         if re.search((r'\bxe\b' or r'\bxir\b' or r'\bxem\b' or r'\bxey\b'), tweet.user.description, re.IGNORECASE):
             pro_xe.append(tweet.user.screen_name)
+        if re.search((r'\bxe\b' or r'\bxir\b' or r'\bxem\b' or r'\bxey\b'), tweet.user.location, re.IGNORECASE):
+            pro_xe.append(tweet.user.screen_name)
         if re.search((r'\bze\b' or r'\bzir\b' or r'\bzem\b'), tweet.user.description, re.IGNORECASE):
+            pro_ze.append(tweet.user.screen_name)
+        if re.search((r'\bze\b' or r'\bzir\b' or r'\bzem\b'), tweet.user.location, re.IGNORECASE):
             pro_ze.append(tweet.user.screen_name)
             #de,dem
    #people who use words like genderqueer, nb
         if re.search((r'\bnonbinary\b' or r'\bgenderqueer\b'), tweet.user.description, re.IGNORECASE):
            nbgq.append(tweet.user.screen_name)
+   # return pro_ze, pro_xe, pro_it, pro_he, pro_she, pro_they
 #list of usernames
 pro = pro_ze + pro_xe + pro_it + pro_he + pro_she + pro_they
 set(pro)
-for tweet in theydies_res:
-    if tweet.user.screen_name not in pro:
-        no_pronouns.append(tweet.user.screen_name)
+
+screennames = []
+#for tweet in gentlethem_res:
+   
+ #   if tweet.user.screen_name not in pro:
+  #      no_pronouns.append(tweet.user.screen_name)
+
 print("length of set of pro: ", len(set(pro)))
-#print(set(pro))
-print(set(no_pronouns))
+
 
          
          #   
@@ -232,21 +249,23 @@ she_they = []
 nb = []
 tweets = []
 multi = 0
-screennames = []
+
 #now to compare how many users are multiple lists
 #two sets of pronouns are still being counted in they, they need to be removed from the original list
-for tweet in theydies_res:
-    screennames.append(tweet.user.screen_name)
-    if re.search((r'\bthey\b' or r'\bthem\b'), tweet.user.description, re.IGNORECASE):
+#def twoPronouns(x): 
+for tweet in himbo_res:
+        screennames.append(tweet.user.screen_name)
+if re.search((r'\bthey\b' or r'\bthem\b'), tweet.user.description, re.IGNORECASE):
         nb.append(tweet.user.screen_name)
-    if re.search((r'\bhe\b' or r'\bhe\b'), tweet.user.description, re.IGNORECASE):
-        if tweet.user.screen_name in nb:
-            he_they.append(tweet.user.screen_name)
-    if re.search((r'\bshe\b' or r'\bher\b'), tweet.user.description, re.IGNORECASE):
-        if tweet.user.screen_name in nb:
-            she_they.append(tweet.user.screen_name)
+        if re.search((r'\bhe\b' or r'\bhe\b'), tweet.user.description, re.IGNORECASE):
+            if tweet.user.screen_name in nb:
+                he_they.append(tweet.user.screen_name)
+            if re.search((r'\bshe\b' or r'\bher\b'), tweet.user.description, re.IGNORECASE):
+                if tweet.user.screen_name in nb:
+                    she_they.append(tweet.user.screen_name)
+   # return he_they, she_they
     #need to code for if someone is in both categories
-'''   
+ 
 #total = len(set(pro_they)) + len(set(pro_she))+ len(set(pro_he)) + nopronouns + len(set(pro_it)) + len(set(pro_xe))+ len(set(pro_ze)) +len(set(he_they)) + len(set(she_they))
 #percentage of people who do not have pronouns in their bios
 #print("Percentage of people with no pronouns:", nopronouns / total)
@@ -292,11 +311,11 @@ plt.pie(sizes, labels=labels,explode= (0.01,0.01,0.01,0.01,0.01,0.01,0.01,), aut
 plt.axis('equal')
 plt.show()
 
-'''
+
 import time
 
 # Create empty dataframe
-user_features_list = ["screen_name", "name", "location", "bio",
+user_features_list = ["screen_name", "name", "location", "bio", "tweet",
                       "he/him", "she/her", "they/them",
                       "it/its", "xe/xem", "ze/zir"]
 # features such as "he/him", etc. and "theybie", etc. can or could be represented by 1s and 0s (or Yes's and No's if you prefer)
@@ -304,70 +323,62 @@ user_features_list = ["screen_name", "name", "location", "bio",
 # just my two cents though, take whatever you wanna use!
 
 #need to remove duplicates
-users_df = pd.DataFrame(columns = user_features_list)
 
+#users_df = pd.DataFrame(columns = user_features_list)
 # account list for people we want to analyze
-account_list = ['uwucien','notsumma','flowerhija','annaperng']
+#
 
 # Loop through each user in the list of users, extract features and append the features to users_df
-for user in screennames:
+#def createDF(x): 
+users_df = pd.DataFrame(columns = user_features_list)
+for tweet in himbo_res:
     # Create empty dict
-    user_features = {}
+        user_features = {}
     # Get user data
-    if user in pro:
-        item = api.get_user(user)
-        user_features['bio'] = item.description
-        user_features['screen_name'] = item.screen_name
-        user_features['name'] = item.name
-        user_features['location'] = item.location
-        user_features['bio'] = item.description
+    #if user in pro:
+   # item = api.get_user(user)
+        user_features['bio'] = tweet.user.description
+        user_features['screen_name'] = tweet.user.screen_name
+        user_features['name'] = tweet.user.name
+        user_features['tweet'] = tweet.text
+        user_features['location'] = tweet.user.location
         #fills in the yeses
-        if user in pro_they:
+        if tweet.user.screen_name in pro_they:
             user_features['they/them'] = 'yes'
-        if user in pro_he:
+        if tweet.user.screen_name in pro_he:
             user_features['he/him'] = 'yes'
-        if user in pro_she:
+        if tweet.user.screen_name in pro_she:
             user_features['she/her'] = 'yes'
-        if user in pro_it:
+        if tweet.user.screen_name in pro_it:
             user_features['it/its'] = 'yes'
-        if user in pro_xe:
+        if tweet.user.screen_name in pro_xe:
             user_features['xe/xem'] = 'yes'
-        if user in pro_ze:
+        if tweet.user.screen_name in pro_ze:
             user_features['ze/zem'] = 'yes'
         #fills in the nos
-        if user not in pro_he:
+        if tweet.user.screen_name not in pro_he:
             user_features['he/him'] = 'no'
-        if user not in pro_she:
+        if tweet.user.screen_name not in pro_she:
             user_features['she/her'] = 'no'
-        if user not in pro_xe:
+        if tweet.user.screen_name not in pro_xe:
             user_features['xe/xem'] = 'no'
-        if user not in pro_they:
+        if tweet.user.screen_name not in pro_they:
             user_features['they/them'] = 'no'
-        if user not in pro_it:
+        if tweet.user.screen_name not in pro_it:
             user_features['it/its'] = 'no'
-        if user not in pro_ze:
+        if tweet.user.screen_name not in pro_ze:
             user_features['ze/zir'] = 'no'
-        
-    # Concat the dfs
-    user = pd.DataFrame(user_features, index = [0])
-    users_df = pd.concat([users_df, user], ignore_index = True)
-    # Sleep for 5 seconds to avoid rate-limiting
-    # Number of seconds can be tweaked as needed (through trial and error)
-    #time.sleep(5)
+        # Concat the dfs
+        user = pd.DataFrame(user_features, index = [0])
+        users_df = pd.concat([users_df, user], ignore_index = True)
+        users_df.to_csv('himbo_417.csv', encoding='utf-8', index=False)
+#        return users_df
     
-users_df.dropna(subset=["screen_name"], inplace=True)
-users_df.to_csv('theydies_415.csv', encoding='utf-8', index=False)
-
-
-
-'''plt.hist(multi, bins = 30)
-plt.title("Amount of pronouns")
-plt.xlabel("Number of Hosts with Multiple Listings")
-plt.ylabel("Frequency")
-plt.show()
-
-#Print out the percentages of the pronouns/gender identities.
-
+#x = input("Enter a query: ")
+#searchTweet(x)
+#twoPronouns(x)
+#createDF(x)
+'''
 #search for them based neologisms
 for tweet in theythems_res:
     if re.search((r'\bboy[a-zA-Z]*'), tweet.text):
