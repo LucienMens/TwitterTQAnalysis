@@ -134,7 +134,7 @@ user_features_list = ["screen_name", "name", "location", "bio", "tweet",
 #def createDF(x): 
 #terms we want to search for
 #i dont want users with this in their screenname, just the tweet
-query_list = ["thembo","bimbo","himbo","theydies", "gentlethem", "gentlemen", "theybie", "transgender","theybie","transgender","transwoman","transman"]
+query_list = ["thembo","bimbo","himbo","theydies","ladies", "gentlethem", "gentlemen", "theybie", "transgender","transwoman","transman"]
 res_dict = {} 
 
 #english language tweets
@@ -237,12 +237,13 @@ for query in query_list:
         # Concat the dfs
         user = pd.DataFrame(user_features, index = [0])
         users_df = pd.concat([users_df, user], ignore_index = True)
-    date_string = '4_18'
+    date_string = '4_22'
     filename = '%s_%s.csv' % (query, date_string)   
     users_df.to_csv(filename, encoding='utf-8', index=False)
    # return pro_ze, pro_xe, pro_it, pro_he, pro_she, pro_they
 #list of usernames
     pro = pro_ze + pro_xe + pro_it + pro_he + pro_she + pro_they
+    print(query," length of set of pro: ", len(set(pro)))
 
 screennames = []
 #for tweet in gentlethem_res:
@@ -250,7 +251,7 @@ screennames = []
  #   if tweet.user.screen_name not in pro:
   #      no_pronouns.append(tweet.user.screen_name)
 
-print("length of set of pro: ", len(set(pro)))
+#print("length of set of pro: ", len(set(pro)))
 
 #removes duplicates - list(set(x))
 #nopronouns = (len(set(pro_they))+len(set(pro_he))+len(set(pro_she))+len(set(pro_xe))+len(set(pro_ze))+len(set(pro_it))) - (len(set(pro)))
