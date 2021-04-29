@@ -237,7 +237,7 @@ for query in query_list:
         # Concat the dfs
         user = pd.DataFrame(user_features, index = [0])
         users_df = pd.concat([users_df, user], ignore_index = True)
-    date_string = '4_22'
+    date_string = '4_24'
     filename = '%s_%s.csv' % (query, date_string)   
     users_df.to_csv(filename, encoding='utf-8', index=False)
    # return pro_ze, pro_xe, pro_it, pro_he, pro_she, pro_they

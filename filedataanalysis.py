@@ -18,6 +18,7 @@ from datetime import date
 import re, string, random
 import nltk.classify.util
 from nltk.classify import NaiveBayesClassifier
+from scipy import stats
 '''
 x = input("Enter a file name: ")
 #data needs to be a global var for plots
@@ -40,6 +41,26 @@ print(num_they,num_he,num_she)
 #count number of each pronoun
 #run chi squared
 
-thembo_fn_list = ["4_17/thembo_417.csv", "4_18/thembo_418.csv", "4_19/thembo_419.csv"]
+thembo_fn_list = ["4_17/thembo_417.csv", "4_18/thembo_4_18.csv", "4_19/thembo_4_19.csv", "4_20/thembo_4_20.csv", "4_21/thembo_4_21.csv", "4_22/thembo_4_22.csv"]
 df_list = [pd.read_csv(fn) for fn in thembo_fn_list] 
 concatenated = pd.concat(df_list).reset_index(drop=True)
+multi =  concatenated['he/him'].value_counts()
+num_he = multi[1]
+he = num_he / 585
+multi =  concatenated['she/her'].value_counts()
+num_she = multi[1]
+she = num_she / 585
+multi =  concatenated['they/them'].value_counts()
+num_they = multi[1]
+they = num_they / 585
+multi =  concatenated['xe/xem'].value_counts()
+num_xe = multi[1]
+xe = num_xe / 585
+multi =  concatenated['it/its'].value_counts()
+num_it = multi[1]
+it = num_it / 585
+#multi =  concatenated['ze/zir'].value_counts()
+#num_ze = multi[1]
+print(num_they,num_he,num_she, num_xe, num_it)
+print(stats.chisquare([num_they,num_he,num_she, num_xe, num_it]))
+print(stats.chisquare([num_he,num_she]))
